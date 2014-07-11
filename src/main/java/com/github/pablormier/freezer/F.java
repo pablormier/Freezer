@@ -7,9 +7,7 @@ public interface F<T> {
 
     boolean isFrozen();
 
-
     void freeze();
-
 
     T instance();
 }
