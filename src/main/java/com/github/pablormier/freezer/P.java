@@ -44,7 +44,7 @@ public final class P<T> {
             @Override
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                 // By default, the target instance for the method invocation is the original instance
-                T internalInstance = freezableProxiedInstance.instance();
+                T internalInstance = originalInstance;
 
                 if (method.getAnnotation(Mutator.class) != null && freezableProxiedInstance.isFrozen()) {
                     // Protect access by copy-on-write strategy. Change also
@@ -63,19 +63,19 @@ public final class P<T> {
 
                     // Create a new freezable but using the proxied instance. This may be referenced by other objects!
                     freezableProxiedInstance = Freezable.of(proxied);
+                    originalInstance = newInstance;
                     return method.invoke(newInstance, args);
                 }
                 // Redirect the call to the instance (the original or the cloned)
-                return method.invoke(freezableInstance.instance(), args);
+                return method.invoke(originalInstance, args);
             }
         };
 
-        // Generate a proxy for the object to intercept and wrap annotated methods with the appropriated checks
-        T internalInstance = freezableInstance.instance();
+        // Generate a proxy for the object to intercept and wrap annotated methods with the appropriated check
+        T proxiedInstance = (T) Proxy.newProxyInstance(originalInstance.getClass().getClassLoader(),
+                originalInstance.getClass().getInterfaces(), handler);
 
-        T proxiedInstance = (T) Proxy.newProxyInstance(internalInstance.getClass().getClassLoader(),
-                internalInstance.getClass().getInterfaces(), handler);
-
+        // Simple Freezable Proxy
         this.freezableProxiedInstance = new F<T>() {
             @Override
             public boolean isFrozen() {
