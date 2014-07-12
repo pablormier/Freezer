@@ -5,13 +5,15 @@ package com.github.pablormier.freezer;
  */
 public class Example {
 
-    public interface Mutable {
+    public interface MutableMethods {
+
         @Mutator
         public void setValue(Integer value);
+
         public Integer getValue();
     }
 
-    public static class MyObject implements Cloneable<MyObject>, Mutable {
+    public static class MyObject implements Cloneable<MyObject>, MutableMethods {
         private Integer value = 0;
 
         public MyObject(Integer value) {
@@ -24,7 +26,6 @@ public class Example {
         }
 
         @Override
-        @Mutator
         public void setValue(Integer value) {
             this.value = value;
         }
@@ -36,23 +37,28 @@ public class Example {
 
         @Override
         public String toString() {
-            return "O(" + value + ")";
+            return "Obj(v=" + value + ")";
         }
     }
 
 
     public static void main(String[] args) {
+
+        // Original instance
+        MyObject obj = new MyObject(0);
         // Shared freezable object
-        final F<Mutable> freezableObj = Freezable.of(new MyObject(0));
+        final F<MutableMethods> freezableObj = Freezable.of(obj);
         // Create refs to freezableObj
-        P<Mutable> r1 = new P<>(freezableObj);
-        P<Mutable> r2 = new P<>(freezableObj);
+        P<MutableMethods> r1 = new P<>(freezableObj);
+        P<MutableMethods> r2 = new P<>(freezableObj);
 
         System.out.println("Initial configuration");
         System.out.println("R1 " + r1);
         System.out.println("R2 " + r2);
-        System.out.println("R1 " + r1.get().instance().getValue());
-        System.out.println("R2 " + r2.get().instance().getValue());
+
+        // One of them changes the value
+        System.out.println("R2 changes the value of the instance to 5");
+        r2.get().instance().setValue(5);
 
         // Now, we freeze ref2. Ref2 will keep the original reference.
         r1.get().freeze();
@@ -65,14 +71,26 @@ public class Example {
         // r1.get().instance() returns a proxied interface of the object. Method setValue
         // is intercepted. Since freezableObj is frozen, a new copy is generated and assigned
         // to r1.
-        System.out.println("R2 tries to modify the value");
+        System.out.println("R2 modify the value to 1 and obtains a new copy");
         r2.get().instance().setValue(1);
-
+        // Now r2 has a different copy
         System.out.println("R1 " + r1);
         System.out.println("R2 " + r2);
-        System.out.println("R1 " + r1.get().instance().getValue());
-        System.out.println("R2 " + r2.get().instance().getValue());
 
-        // We change
+        System.out.println("We create R3 with the first instance (still locked)");
+        P<MutableMethods> r3 = new P<>(freezableObj);
+        System.out.println("R3 " + r3);
+
+        System.out.println("R2 has freedom to change its own copy");
+        r2.get().instance().setValue(100);
+        System.out.println("R1 " + r1);
+        System.out.println("R2 " + r2);
+        System.out.println("R3 " + r3);
+
+        System.out.println("R3 changes its copy");
+        r3.get().instance().setValue(200);
+        System.out.println("R1 " + r1);
+        System.out.println("R2 " + r2);
+        System.out.println("R3 " + r3);
     }
 }

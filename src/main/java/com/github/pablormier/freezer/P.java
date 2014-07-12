@@ -61,7 +61,7 @@ public final class P<T> {
                     // Change the original ref and create a new Freezable of the new instance.
                     T proxied = (T)Proxy.newProxyInstance(newInstance.getClass().getClassLoader(), newInstance.getClass().getInterfaces(), this);
 
-                    // Create a new freezable but using the proxied instance. This may be referenced by other objects!
+                    // Create a new freezable but using the proxied instance (unlocked by default). This may be referenced by other objects!
                     freezableProxiedInstance = Freezable.of(proxied);
                     originalInstance = newInstance;
                     return method.invoke(newInstance, args);
@@ -88,7 +88,13 @@ public final class P<T> {
             }
 
             @Override
+            public void unfreeze() {
+                freezableInstance.unfreeze();
+            }
+
+            @Override
             public T instance() {
+                // Always return the proxied instance, not the original!
                 return proxiedInstance;
             }
 

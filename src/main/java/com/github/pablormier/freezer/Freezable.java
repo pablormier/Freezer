@@ -1,5 +1,7 @@
 package com.github.pablormier.freezer;
 
+import java.lang.reflect.Field;
+
 /**
  * @author Pablo Rodríguez Mier <<a href="mailto:pablo.rodriguez.mier@usc.es">pablo.rodriguez.mier@usc.es</a>>
  */
@@ -12,16 +14,34 @@ public final class Freezable<T> implements F<T> {
         this.instance = instance;
     }
 
+    @Override
     public boolean isFrozen() {
         return this.frozen;
     }
 
-
+    @Override
     public void freeze() {
         this.frozen = true;
+        // Call freeze in all freezable attributes of the instance
+        for(Field f : instance.getClass().getDeclaredFields()){
+            try {
+                f.setAccessible(true);
+                Object obj = f.get(instance);
+                if (obj instanceof F) {
+                    ((F) obj).freeze();
+                }
+            } catch (IllegalAccessException e){
+                throw new RuntimeException("Cannot access field " + f);
+            }
+        }
     }
 
+    @Override
+    public void unfreeze() {
+        this.frozen = false;
+    }
 
+    @Override
     public T instance() {
         return instance;
     }
