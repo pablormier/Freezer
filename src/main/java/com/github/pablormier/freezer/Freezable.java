@@ -25,7 +25,9 @@ public final class Freezable<T> implements F<T> {
         // Call freeze in all freezable attributes of the instance
         for(Field f : instance.getClass().getDeclaredFields()){
             try {
-                f.setAccessible(true);
+                if (!f.isAccessible()) {
+                    f.setAccessible(true);
+                }
                 Object obj = f.get(instance);
                 if (obj instanceof F) {
                     ((F) obj).freeze();

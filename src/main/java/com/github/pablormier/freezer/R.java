@@ -9,12 +9,12 @@ import java.lang.reflect.Proxy;
  *
  * @author Pablo Rodríguez Mier <<a href="mailto:pablo.rodriguez.mier@usc.es">pablo.rodriguez.mier@usc.es</a>>
  */
-public final class P<T> {
+public final class R<T> implements F<T> {
     private F<T> freezableProxiedInstance;
     private T originalInstance;
 
     @SuppressWarnings("unchecked")
-    public P(F<T> freezableInstance) {
+    public R(F<T> freezableInstance) {
         // Automatically find a valid cloner in the classpath. The cloner is needed for
         // cloning the instance when the object is frozen.
         this(freezableInstance, null);
@@ -25,7 +25,7 @@ public final class P<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public P(final F<T> freezableInstance, Cloner<T> cloner) {
+    public R(final F<T> freezableInstance, Cloner<T> cloner) {
 
         this.freezableProxiedInstance = freezableInstance;
         this.originalInstance = freezableInstance.instance();
@@ -76,32 +76,10 @@ public final class P<T> {
                 originalInstance.getClass().getInterfaces(), handler);
 
         // Simple Freezable Proxy
-        this.freezableProxiedInstance = new F<T>() {
-            @Override
-            public boolean isFrozen() {
-                return freezableInstance.isFrozen();
-            }
-
-            @Override
-            public void freeze() {
-                freezableInstance.freeze();
-            }
-
-            @Override
-            public void unfreeze() {
-                freezableInstance.unfreeze();
-            }
-
+        this.freezableProxiedInstance = new ProxyF<T>(freezableInstance) {
             @Override
             public T instance() {
-                // Always return the proxied instance, not the original!
                 return proxiedInstance;
-            }
-
-            @Override
-            public String toString(){
-                if (isFrozen()) return "*" + instance().toString() + "*";
-                return instance().toString();
             }
         };
     }
@@ -110,8 +88,32 @@ public final class P<T> {
         return freezableProxiedInstance;
     }
 
+    public static <T> R<T> createRef(F<T> freezable){
+        return new R<>(freezable);
+    }
+
     @Override
     public String toString() {
-        return "P[" + this.freezableProxiedInstance +  "]";
+        return "Ref[" + this.freezableProxiedInstance +  "]";
+    }
+
+    @Override
+    public boolean isFrozen() {
+        return get().isFrozen();
+    }
+
+    @Override
+    public void freeze() {
+        get().freeze();
+    }
+
+    @Override
+    public void unfreeze() {
+        get().unfreeze();
+    }
+
+    @Override
+    public T instance() {
+        return get().instance();
     }
 }

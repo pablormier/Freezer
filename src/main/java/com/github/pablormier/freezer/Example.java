@@ -5,7 +5,7 @@ package com.github.pablormier.freezer;
  */
 public class Example {
 
-    public interface MutableMethods {
+    public interface ObjectInterface {
 
         @Mutator
         public void setValue(Integer value);
@@ -13,7 +13,7 @@ public class Example {
         public Integer getValue();
     }
 
-    public static class MyObject implements Cloneable<MyObject>, MutableMethods {
+    public static class MyObject implements Cloneable<MyObject>, ObjectInterface {
         private Integer value = 0;
 
         public MyObject(Integer value) {
@@ -44,13 +44,12 @@ public class Example {
 
     public static void main(String[] args) {
 
-        // Original instance
-        MyObject obj = new MyObject(0);
         // Shared freezable object
-        final F<MutableMethods> freezableObj = Freezable.of(obj);
+        final F<ObjectInterface> freezableObj = Freezable.of(new MyObject(0));
+
         // Create refs to freezableObj
-        P<MutableMethods> r1 = new P<>(freezableObj);
-        P<MutableMethods> r2 = new P<>(freezableObj);
+        R<ObjectInterface> r1 = R.createRef(freezableObj);
+        R<ObjectInterface> r2 = R.createRef(freezableObj);
 
         System.out.println("Initial configuration");
         System.out.println("R1 " + r1);
@@ -58,10 +57,10 @@ public class Example {
 
         // One of them changes the value
         System.out.println("R2 changes the value of the instance to 5");
-        r2.get().instance().setValue(5);
+        r2.instance().setValue(5);
 
         // Now, we freeze ref2. Ref2 will keep the original reference.
-        r1.get().freeze();
+        r1.freeze();
 
         System.out.println("R1 calls freeze()");
         System.out.println("R1 " + r1);
@@ -72,23 +71,23 @@ public class Example {
         // is intercepted. Since freezableObj is frozen, a new copy is generated and assigned
         // to r1.
         System.out.println("R2 modify the value to 1 and obtains a new copy");
-        r2.get().instance().setValue(1);
+        r2.instance().setValue(1);
         // Now r2 has a different copy
         System.out.println("R1 " + r1);
         System.out.println("R2 " + r2);
 
         System.out.println("We create R3 with the first instance (still locked)");
-        P<MutableMethods> r3 = new P<>(freezableObj);
+        R<ObjectInterface> r3 = new R<>(freezableObj);
         System.out.println("R3 " + r3);
 
         System.out.println("R2 has freedom to change its own copy");
-        r2.get().instance().setValue(100);
+        r2.instance().setValue(100);
         System.out.println("R1 " + r1);
         System.out.println("R2 " + r2);
         System.out.println("R3 " + r3);
 
         System.out.println("R3 changes its copy");
-        r3.get().instance().setValue(200);
+        r3.instance().setValue(200);
         System.out.println("R1 " + r1);
         System.out.println("R2 " + r2);
         System.out.println("R3 " + r3);
