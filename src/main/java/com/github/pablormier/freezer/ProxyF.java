@@ -32,7 +32,6 @@ public abstract class ProxyF<T> implements F<T> {
 
     @Override
     public String toString(){
-        if (isFrozen()) return "*" + instance().toString() + "*";
-        return instance().toString();
+        return freezable.toString();
     }
 }

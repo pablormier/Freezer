@@ -46,6 +46,7 @@ public class Example {
 
         // Shared freezable object
         final F<ObjectInterface> freezableObj = Freezable.of(new MyObject(0));
+        System.out.println("We create a shared object: " + freezableObj);
 
         // Create refs to freezableObj
         R<ObjectInterface> r1 = R.createRef(freezableObj);

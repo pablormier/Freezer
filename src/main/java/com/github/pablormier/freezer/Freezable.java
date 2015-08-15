@@ -74,7 +74,8 @@ public final class Freezable<T> implements F<T> {
 
     @Override
     public String toString() {
-        if (frozen) return "*" + instance.toString() + "*";
-        return instance.toString();
+        String repr = instance.toString() + "[hash=" + instance.hashCode() + "]";
+        if (frozen) return "*" + repr + "*";
+        return repr;
     }
 }
