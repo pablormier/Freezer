@@ -3,7 +3,7 @@ package com.github.pablormier.freezer;
 import java.lang.reflect.Field;
 
 /**
- * @author Pablo Rodríguez Mier <<a href="mailto:pablo.rodriguez.mier@usc.es">pablo.rodriguez.mier@usc.es</a>>
+ * @author Pablo Rodríguez Mier <<a href="mailto:pablo.rodriguez.mier@gmail.com">pablo.rodriguez.mier@gmail.com</a>>
  */
 public final class Freezable<T> implements F<T> {
     private boolean frozen = false;

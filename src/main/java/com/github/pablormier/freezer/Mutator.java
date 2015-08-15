@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 
 /**
- * @author Pablo Rodríguez Mier <<a href="mailto:pablo.rodriguez.mier@usc.es">pablo.rodriguez.mier@usc.es</a>>
+ * @author Pablo Rodríguez Mier <<a href="mailto:pablo.rodriguez.mier@gmail.com">pablo.rodriguez.mier@gmail.com</a>>
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

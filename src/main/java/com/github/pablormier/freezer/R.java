@@ -7,9 +7,9 @@ import java.lang.reflect.Proxy;
 /**
  * Dynamic Proxy Ref to Freezable objects.
  *
- * @author Pablo Rodríguez Mier <<a href="mailto:pablo.rodriguez.mier@usc.es">pablo.rodriguez.mier@usc.es</a>>
+ * @author Pablo Rodríguez Mier <<a href="mailto:pablo.rodriguez.mier@gmail.com">pablo.rodriguez.mier@gmail.com</a>>
  */
-public final class R<T> implements F<T> {
+public final class R<T> implements F<T>, Cloneable<R> {
     private F<T> freezableProxiedInstance;
     private T originalInstance;
 
@@ -115,5 +115,11 @@ public final class R<T> implements F<T> {
     @Override
     public T instance() {
         return get().instance();
+    }
+
+    @Override
+    public R<T> clone() {
+        // Clone instance
+        return createRef(Freezable.of(originalInstance));
     }
 }
