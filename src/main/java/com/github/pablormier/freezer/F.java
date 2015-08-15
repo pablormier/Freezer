@@ -15,4 +15,37 @@ public interface F<T> {
     void unfreeze();
 
     T instance();
+
+    class Default<T> implements F<T> {
+        private F<T> freezable;
+
+        public Default(F<T> freezable) {
+            this.freezable = freezable;
+        }
+
+        @Override
+        public boolean isFrozen() {
+            return freezable.isFrozen();
+        }
+
+        @Override
+        public void freeze() {
+            freezable.freeze();
+        }
+
+        @Override
+        public void unfreeze() {
+            freezable.unfreeze();
+        }
+
+        @Override
+        public T instance() {
+            return freezable.instance();
+        }
+
+        @Override
+        public String toString(){
+            return freezable.toString();
+        }
+    }
 }

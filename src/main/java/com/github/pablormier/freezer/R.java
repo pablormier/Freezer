@@ -76,7 +76,7 @@ public final class R<T> implements F<T>, Cloneable<R> {
                 originalInstance.getClass().getInterfaces(), handler);
 
         // Simple Freezable Proxy
-        this.freezableProxiedInstance = new ProxyF<T>(freezableInstance) {
+        this.freezableProxiedInstance = new F.Default<T>(freezableInstance) {
             @Override
             public T instance() {
                 return proxiedInstance;
